@@ -5,19 +5,20 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static configuration.Before.*;
+import static configuration.Before.apiRequest;
+import static configuration.Before.createRequestSpecification;
 
-public class Me {
+public class Project {
 
     @BeforeClass
     public void loadRequestSpecification() {
         createRequestSpecification();
     }
 
-    @Test(groups = "GetRequest")
-    public void getMe() {
+    @Test
+    public void getProject() {
         apiRequest.method(ApiMethod.GET)
-                .endpoint("me");
+                .endpoint("projects");
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
     }

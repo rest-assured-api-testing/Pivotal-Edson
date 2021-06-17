@@ -17,6 +17,7 @@ dependencies {
     implementation 'org.testng:testng:7.4.0'
     implementation group: 'io.cucumber', name: 'cucumber-java', version: '6.10.4'
     implementation group: 'io.cucumber', name: 'cucumber-testng', version: '6.10.4'
+    compile 'io.github.cdimascio:java-dotenv:5.2.2'
 }
 
 test {
