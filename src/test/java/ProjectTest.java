@@ -76,5 +76,4 @@ public class ProjectTest {
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 204);
     }
-
 }
