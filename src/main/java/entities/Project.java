@@ -1,6 +1,7 @@
 package entities;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Project {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -192,11 +193,11 @@ public class Project {
     public void setInitial_velocity(int initial_velocity) {
         this.initial_velocity = initial_velocity;
     }
-
+    @JsonProperty("public")
     public Boolean getPublic_() {
         return public_;
     }
-
+    @JsonProperty("public")
     public void setPublic_(Boolean public_) {
         this.public_ = public_;
     }

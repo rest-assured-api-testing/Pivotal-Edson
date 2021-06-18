@@ -28,7 +28,6 @@ public class ApiManager {
                 .body(apiRequest.getBody())
                 .request(apiRequest.getMethod().name()
                         , apiRequest.getEndpoint());
-
         return new ApiResponse(response);
     }
 }
