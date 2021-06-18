@@ -1,18 +1,14 @@
 import api.ApiManager;
 import api.ApiMethod;
 import api.ApiResponse;
+import configuration.Before;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static configuration.Before.*;
 
-public class NotificationTest {
-
-    @BeforeClass
-    public void loadRequestSpecification() {
-        createRequestSpecification();
-    }
+public class NotificationTest extends Before {
 
     @Test
     public void getNotifications() {

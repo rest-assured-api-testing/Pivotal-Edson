@@ -68,8 +68,16 @@ public class ApiRequest {
         headers.add(new Header(header, value));
     }
 
+    public void clearQueryParam(){
+        queryParams.clear();
+    }
+
     public void setQueryParam(final String param, final String value) {
         queryParams.put(param, value);
+    }
+
+    public void clearPathParam(){
+        pathParams.clear();
     }
 
     public void setPathParam(final String param, final String value) {

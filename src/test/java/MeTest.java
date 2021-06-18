@@ -1,24 +1,28 @@
 import api.ApiManager;
-import api.ApiMethod;
 import api.ApiResponse;
+import configuration.Before;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static configuration.Before.*;
+import static io.restassured.RestAssured.given;
 
-public class MeTest {
-
-    @BeforeClass
-    public void loadRequestSpecification() {
-        createRequestSpecification();
-    }
+public class MeTest extends Before {
 
     @Test(groups = "GetRequest")
     public void getMe() {
-        apiRequest.method(ApiMethod.GET)
-                .endpoint("me");
+        apiRequest.endpoint("me");
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
+    }
+
+    @Test
+    public void GetListAllProjects() {
+        given()
+                .header("X-TrackerToken", "9f399d45911b218b5d0538cbf4d626ad")
+                .when()
+                .get("https://www.pivotaltracker.com/services/v5/me")
+                .then()
+                .assertThat()
+                .log().body();
     }
 }

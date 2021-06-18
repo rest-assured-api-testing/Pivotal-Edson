@@ -3,6 +3,7 @@ import api.ApiMethod;
 import api.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import configuration.Before;
 import entities.Membership;
 import entities.ProjectMembership;
 import org.testng.Assert;
@@ -11,12 +12,7 @@ import org.testng.annotations.Test;
 
 import static configuration.Before.*;
 
-public class MembershipTest {
-
-    @BeforeClass
-    public void loadRequestSpecification() {
-        createRequestSpecification();
-    }
+public class MembershipTest extends Before {
 
     @Test
     public void getAllMembersOfAProject() {

@@ -3,77 +3,68 @@ import api.ApiMethod;
 import api.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import configuration.Before;
 import entities.Project;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static configuration.Before.apiRequest;
-import static configuration.Before.createRequestSpecification;
-import static io.restassured.RestAssured.given;
+public class ProjectTest extends Before {
 
-public class ProjectTest {
 
-    @BeforeClass
-    public void loadRequestSpecification() {
-        createRequestSpecification();
-    }
-
-    @Test
+    @Test(groups = "GetRequest")
     public void getProject() {
-        apiRequest.method(ApiMethod.GET)
-                .endpoint("projects");
+        apiRequest.endpoint("projects");
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        apiResponse.getResponse().then().log().body();
     }
 
-    @Test
+    @Test(groups = {"GetRequest", "CreateProject", "DeleteProject"})
     public void getAProject() {
-        apiRequest.method(ApiMethod.GET)
-                .endpoint("/projects/{projectId}")
-                .addPathParam("projectId", "2504464");
-
+        apiRequest.endpoint("/projects/{projectId}")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString());
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Project project = apiResponse.getBody(Project.class);
 
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
         Assert.assertEquals(project.getKind(), "project");
         apiResponse.validateBodySchema("schemas/project.json");
+        apiResponse.getResponse().then().log().body();
     }
 
-    @Test
+    @Test(groups = {"GetRequest", "CreateProject", "DeleteProject"})
     public void getPeopleInProject() {
-        apiRequest.method(ApiMethod.GET)
-                .endpoint("/my/people")
-                .addQueryParam("project_id", "2504464");
+        apiRequest.endpoint("/my/people")
+                .addQueryParam("project_id", apiResponse.getBody(Project.class).getId().toString());
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        apiResponse.getResponse().then().log().body();
     }
 
-    @Test
+    @Test(groups = {"PostRequest", "DeleteProject"})
     public void createAProject() throws JsonProcessingException {
         Project sendProject = new Project();
         sendProject.setName("ApiTesting2");
-        apiRequest.method(ApiMethod.POST)
-                .endpoint("/projects")
+        apiRequest.endpoint("/projects")
                 .body(new ObjectMapper().writeValueAsString(sendProject));
 
-        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
+        apiResponse = ApiManager.executeWithBody(apiRequest);
         Project project = apiResponse.getBody(Project.class);
 
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
         Assert.assertEquals(project.getKind(), "project");
         apiResponse.validateBodySchema("schemas/project.json");
+        apiResponse.getResponse().then().log().body();
     }
 
-    @Test
-    public void deleteAProject() {
-        apiRequest.method(ApiMethod.DELETE)
-                .endpoint("/projects/{projectId}")
-                .addPathParam("projectId", "2505570");
+    @Test(groups = {"DeleteRequest", "CreateProject"})
+    public void deleteAnProject() {
+        apiRequest.endpoint("/projects/{projectId}")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString());
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 204);
+        apiResponse.getResponse().then().log().body();
     }
 }

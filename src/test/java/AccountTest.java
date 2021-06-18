@@ -1,6 +1,7 @@
 import api.ApiManager;
 import api.ApiMethod;
 import api.ApiResponse;
+import configuration.Before;
 import entities.Account;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -8,12 +9,7 @@ import org.testng.annotations.Test;
 
 import static configuration.Before.*;
 
-public class AccountTest {
-
-    @BeforeClass
-    public void loadRequestSpecification() {
-        createRequestSpecification();
-    }
+public class AccountTest extends Before {
 
     @Test
     public void getAllAccounts() {
