@@ -15,7 +15,7 @@ public class NotificationTest {
     }
 
     @Test
-    public void getNotificationsTest() {
+    public void getNotifications() {
         apiRequest.method(ApiMethod.GET)
                 .endpoint("/my/notifications")
                 .addQueryParam("envelope", "true");

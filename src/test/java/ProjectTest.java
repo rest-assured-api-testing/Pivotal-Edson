@@ -52,7 +52,7 @@ public class ProjectTest {
     }
 
     @Test
-    public void createAProjectTest() throws JsonProcessingException {
+    public void createAProject() throws JsonProcessingException {
         Project sendProject = new Project();
         sendProject.setName("ApiTesting2");
         apiRequest.method(ApiMethod.POST)
