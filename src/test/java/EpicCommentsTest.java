@@ -4,7 +4,6 @@ import api.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import configuration.Before;
-import entities.Epic;
 import entities.EpicComment;
 import entities.Project;
 import entities.StoryComment;
