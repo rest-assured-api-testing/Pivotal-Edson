@@ -28,4 +28,30 @@ public class AccountTest extends Before {
         Assert.assertEquals(account.getKind(), "account");
         apiResponse.getResponse().then().log().body();
     }
+
+    @Test(groups = {"GetRequest", "GetAccounts"})
+    public void ItShouldAnAccountWithParamsInUpperCase() {
+        apiRequest.endpoint("/accounts/{ACCOUNTID}")
+                .addPathParam("ACCOUNTID", account.getId().toString());
+
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+        Account account = apiResponse.getBody(Account.class);
+
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        Assert.assertEquals(account.getKind(), "account");
+        apiResponse.getResponse().then().log().body();
+    }
+
+    @Test(groups = {"GetRequest", "GetAccounts"})
+    public void ItShouldAnAccountWithParamsInLowerCase() {
+        apiRequest.endpoint("/accounts/{accountid}")
+                .addPathParam("accountid", account.getId().toString());
+
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+        Account account = apiResponse.getBody(Account.class);
+
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        Assert.assertEquals(account.getKind(), "account");
+        apiResponse.getResponse().then().log().body();
+    }
 }

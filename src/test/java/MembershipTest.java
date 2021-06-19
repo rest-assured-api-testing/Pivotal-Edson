@@ -31,6 +31,20 @@ public class MembershipTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
+    @BeforeMethod(onlyForGroups = "AddAMemberOfAProject")
+    public void BeforeAddAMemberToAProject() throws JsonProcessingException {
+        ProjectMembership projectMembership = new ProjectMembership();
+        projectMembership.setEmail("beforeemailtest@gmail.com");
+        projectMembership.setRole("member");
+        apiRequest.method(ApiMethod.POST)
+                .endpoint("/projects/{projectId}/memberships")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .body(new ObjectMapper().writeValueAsString(projectMembership));
+
+        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        apiResponse.getResponse().then().log().body();
+    }
 
     @Test(groups = {"GetRequest", "CreateDeleteProject"})
     public void getAllMembersOfAProject() {
@@ -38,7 +52,6 @@ public class MembershipTest extends Before {
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString());
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
-
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
         apiResponse.getResponse().then().log().body();
     }
@@ -50,10 +63,7 @@ public class MembershipTest extends Before {
                 .addPathParam("memberId", membership.getId().toString());
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
-        Membership membership = apiResponse.getBody(Membership.class);
-
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
-        Assert.assertEquals(membership.getKind(), "project_membership");
     }
 
     @Test(groups = {"PostRequest", "CreateDeleteProject"})
@@ -70,20 +80,6 @@ public class MembershipTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
-    @BeforeMethod(onlyForGroups = "AddAMemberOfAProject")
-    public void BeforeAddAMemberToAProject() throws JsonProcessingException {
-        ProjectMembership projectMembership = new ProjectMembership();
-        projectMembership.setEmail("beforeemailtest@gmail.com");
-        projectMembership.setRole("member");
-        apiRequest.method(ApiMethod.POST)
-                .endpoint("/projects/{projectId}/memberships")
-                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
-                .body(new ObjectMapper().writeValueAsString(projectMembership));
-
-        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
-        Assert.assertEquals(apiResponse.getStatusCode(), 200);
-        apiResponse.getResponse().then().log().body();
-    }
 
     @Test(groups = {"PutRequest", "CreateDeleteProject", "AddAMemberOfAProject", "GetMembersOfAProject"})
     public void updateAMemberOfAProject() throws JsonProcessingException {
@@ -109,5 +105,74 @@ public class MembershipTest extends Before {
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 204);
+    }
+
+    @Test(groups = {"GetRequest", "CreateDeleteProject", "GetMembersOfAProject"})
+    public void ItShouldAGetMemberKindProjectMembership() {
+        apiRequest.endpoint("/projects/{projectId}/memberships/{memberId}")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .addPathParam("memberId", membership.getId().toString());
+
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+        Membership membership = apiResponse.getBody(Membership.class);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        Assert.assertEquals(membership.getKind(), "project_membership");
+    }
+
+    @Test(groups = {"PostRequest", "CreateDeleteProject"})
+    public void ItShouldFailWithTheUnknownRoleWithError400() throws JsonProcessingException {
+        ProjectMembership projectMembership = new ProjectMembership();
+        projectMembership.setEmail("emailtest@gmail.com");
+        projectMembership.setRole("Unknown");
+        apiRequest.endpoint("/projects/{projectId}/memberships")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .body(new ObjectMapper().writeValueAsString(projectMembership));
+
+        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
+        Assert.assertEquals(apiResponse.getStatusCode(), 400);
+        apiResponse.getResponse().then().log().body();
+    }
+
+    @Test(groups = {"PostRequest", "CreateDeleteProject"})
+    public void ItShouldAcceptWithTwoMembersKindOwner() throws JsonProcessingException {
+        ProjectMembership projectMembership = new ProjectMembership();
+        projectMembership.setEmail("emailtest@gmail.com");
+        projectMembership.setRole("Owner");
+        apiRequest.endpoint("/projects/{projectId}/memberships")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .body(new ObjectMapper().writeValueAsString(projectMembership));
+
+        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        apiResponse.getResponse().then().log().body();
+    }
+
+    @Test(groups = {"PutRequest", "CreateDeleteProject", "AddAMemberOfAProject", "GetMembersOfAProject"})
+    public void ItShouldUpdatedWithTheNewRole() throws JsonProcessingException {
+        ProjectMembership projectMembership = new ProjectMembership();
+        projectMembership.setRole("viewer");
+        apiRequest.method(ApiMethod.PUT)
+                .endpoint("/projects/{projectId}/memberships/{memberId}")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .addPathParam("memberId", membership.getId().toString())
+                .body(new ObjectMapper().writeValueAsString(projectMembership));
+
+        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
+        Membership membership = apiResponse.getBody(Membership.class);
+
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        Assert.assertEquals(membership.getRole(), "viewer");
+        apiResponse.getResponse().then().log().body();
+    }
+
+    @Test(groups = {"DeleteRequest", "CreateDeleteProject", "AddAMemberOfAProject", "GetMembersOfAProject"})
+    public void ItShouldFailWhenSendAWrongMemberIDWithError400() {
+        apiRequest.method(ApiMethod.DELETE)
+                .endpoint("/projects/{projectId}/memberships/{memberId}")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .addPathParam("memberId", membership.getId().toString() + "123");
+
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+        Assert.assertEquals(apiResponse.getStatusCode(), 400);
     }
 }

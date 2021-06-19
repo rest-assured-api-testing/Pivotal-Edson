@@ -74,4 +74,69 @@ public class EpicTest extends Before {
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
         Assert.assertEquals(createdEpic.getName(), "Epic Updated");
     }
+
+    @Test(groups = {"PostRequest", "CreateDeleteProject"})
+    public void ItShouldCreateAEpicWithTheNameSpecified() throws JsonProcessingException {
+        Epic epic = new Epic();
+        epic.setName("Epic Test");
+
+        apiRequest.endpoint("/projects/{projectId}/epics")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .body(new ObjectMapper().writeValueAsString(epic));
+        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
+        Epic createdEpic = apiResponse.getBody(Epic.class);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        Assert.assertEquals(createdEpic.getName(), "Epic Test");
+        apiResponse.getResponse().then().log().body();
+    }
+
+    @Test(groups = {"DeleteRequest", "CreateDeleteProject", "CreateEpic"})
+    public void ItShouldDeleteFailWithTheEpicIDWrongWithError400() {
+        apiRequest.method(ApiMethod.DELETE)
+                .endpoint("/projects/{projectId}/epics/{epicId}")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .addPathParam("epicId", createdEpic.getId().toString() + "123");
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+        Assert.assertEquals(apiResponse.getStatusCode(), 400);
+        apiResponse.getResponse().then().log().body();
+    }
+
+    @Test(groups = {"GetRequest", "CreateDeleteProject"})
+    public void ItShouldFailWithTheLastPartInUpperCaseWithError400() {
+        apiRequest.endpoint("/projects/{projectId}/EPICS")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString());
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+        Assert.assertEquals(apiResponse.getStatusCode(), 404);
+        apiResponse.getResponse().then().log().body();
+    }
+
+    @Test(groups = {"GetRequest", "CreateDeleteProject", "CreateEpic"})
+    public void ItShouldGetAEpicWithTheKindEpic() {
+        apiRequest.method(ApiMethod.GET)
+                .endpoint("/projects/{projectId}/epics/{epicId}")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .addPathParam("epicId", createdEpic.getId().toString());
+
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+        apiResponse.getResponse().then().log().body();
+        Epic epic = apiResponse.getBody(Epic.class);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        Assert.assertEquals(epic.getKind(), "epic");
+    }
+
+    @Test(groups = {"PutRequest", "CreateDeleteProject", "CreateEpic"})
+    public void ItShouldUpdatedWithTheNewNameSpecified() throws JsonProcessingException {
+        Epic epic = new Epic();
+        epic.setName("Epic Updated");
+        apiRequest.method(ApiMethod.PUT)
+                .endpoint("/projects/{projectId}/epics/{epicId}")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .addPathParam("epicId", createdEpic.getId().toString())
+                .body(new ObjectMapper().writeValueAsString(epic));
+
+        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
+        Epic createdEpic = apiResponse.getBody(Epic.class);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        Assert.assertEquals(createdEpic.getName(), "Epic Updated");
+    }
 }

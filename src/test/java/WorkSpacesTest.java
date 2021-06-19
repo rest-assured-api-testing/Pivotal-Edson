@@ -10,7 +10,6 @@ import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,6 +87,58 @@ public class WorkSpacesTest extends Before {
         apiRequest.method(ApiMethod.DELETE)
                 .endpoint("/my/workspaces/{workspace_id}")
                 .addPathParam("workspace_id", createdWorkSpaces.getId());
+
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+        Assert.assertEquals(apiResponse.getStatusCode(), 204);
+        apiResponse.getResponse().then().log().body();
+    }
+
+    @Test(groups = {"PostRequest", "CreateDeleteProject", "DeleteAWorkspace"})
+    public void ItShouldCreateAWorkSpaceKindWorkSpace() throws JsonProcessingException {
+        WorkSpaces workSpace = new WorkSpaces();
+        List<Integer> list = new ArrayList<Integer>();
+        list.add(Integer.parseInt(apiResponse.getBody(Project.class).getId().toString()));
+        workSpace.setName("WorkSpace Test");
+        workSpace.setProject_ids(list);
+        apiRequest.method(ApiMethod.POST)
+                .endpoint("/my/workspaces")
+                .body(new ObjectMapper().writeValueAsString(workSpace));
+
+        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
+        createdWorkSpaces = apiResponse.getBody(WorkSpaces.class);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        Assert.assertEquals(createdWorkSpaces.getKind(), "workspace");
+        apiResponse.getResponse().then().log().body();
+    }
+
+    @Test(groups = {"GetRequest"})
+    public void ItShouldFailGetWorkSpacesWithURIInUpperCase() {
+        apiRequest.method(ApiMethod.GET)
+                .endpoint("/my/WORKSPACES");
+
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+        Assert.assertEquals(apiResponse.getStatusCode(), 404);
+        apiResponse.getResponse().then().log().body();
+    }
+
+    @Test(groups = {"GetRequest", "CreateDeleteProject", "CreateAWorkspace", "DeleteAWorkspace"})
+    public void ItShouldGetAWorkSpaceKindWorkSpace() {
+        apiRequest.method(ApiMethod.GET)
+                .endpoint("/my/workspaces/{workspace_id}")
+                .addPathParam("workspace_id", createdWorkSpaces.getId());
+
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+        WorkSpaces createdWorkSpaces = apiResponse.getBody(WorkSpaces.class);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        Assert.assertEquals(createdWorkSpaces.getKind(), "workspace");
+        apiResponse.getResponse().then().log().body();
+    }
+
+    @Test(groups = {"DeleteRequest", "CreateDeleteProject", "CreateAWorkspace"})
+    public void ItShouldDeleteAWorkSpaceAddNumberZeroToLeft() {
+        apiRequest.method(ApiMethod.DELETE)
+                .endpoint("/my/workspaces/{workspace_id}")
+                .addPathParam("workspace_id", "0000" + createdWorkSpaces.getId());
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 204);
