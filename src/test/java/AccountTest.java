@@ -1,4 +1,5 @@
 import api.ApiManager;
+import api.ApiMethod;
 import api.ApiResponse;
 import configuration.Before;
 import entities.Account;
@@ -9,7 +10,8 @@ public class AccountTest extends Before {
 
     @Test(groups = {"GetRequest"})
     public void getAllAccounts() {
-        apiRequest.endpoint("/accounts");
+        apiRequest.method(ApiMethod.GET)
+                .endpoint("/accounts");
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
@@ -18,7 +20,8 @@ public class AccountTest extends Before {
 
     @Test(groups = {"GetRequest", "GetAccounts"})
     public void getAnAccount() {
-        apiRequest.endpoint("/accounts/{accountId}")
+        apiRequest.method(ApiMethod.GET)
+                .endpoint("/accounts/{accountId}")
                 .addPathParam("accountId", account.getId().toString());
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
@@ -31,7 +34,8 @@ public class AccountTest extends Before {
 
     @Test(groups = {"GetRequest", "GetAccounts"})
     public void ItShouldAnAccountWithParamsInUpperCase() {
-        apiRequest.endpoint("/accounts/{ACCOUNTID}")
+        apiRequest.method(ApiMethod.GET)
+                .endpoint("/accounts/{ACCOUNTID}")
                 .addPathParam("ACCOUNTID", account.getId().toString());
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
@@ -44,7 +48,8 @@ public class AccountTest extends Before {
 
     @Test(groups = {"GetRequest", "GetAccounts"})
     public void ItShouldAnAccountWithParamsInLowerCase() {
-        apiRequest.endpoint("/accounts/{accountid}")
+        apiRequest.method(ApiMethod.GET)
+                .endpoint("/accounts/{accountid}")
                 .addPathParam("accountid", account.getId().toString());
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);

@@ -1,4 +1,5 @@
 import api.ApiManager;
+import api.ApiMethod;
 import api.ApiResponse;
 import configuration.Before;
 import entities.Analytics;
@@ -10,7 +11,8 @@ public class AnalyticsTest extends Before {
 
     @Test(groups = {"GetRequest", "CreateDeleteProject"})
     public void getAnalyticsOfAIterationsOfAProject() {
-        apiRequest.endpoint("/projects/{projectId}/iterations/{number}/analytics")
+        apiRequest.method(ApiMethod.GET)
+                .endpoint("/projects/{projectId}/iterations/{number}/analytics")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
                 .addPathParam("number", "1");
 
@@ -21,7 +23,8 @@ public class AnalyticsTest extends Before {
 
     @Test(groups = {"GetRequest", "CreateDeleteProject"})
     public void getAnalyticsWithDetailsOfAIterationsOfAProject() {
-        apiRequest.endpoint("/projects/{projectId}/iterations/{number}/analytics/cycle_time_details")
+        apiRequest.method(ApiMethod.GET)
+                .endpoint("/projects/{projectId}/iterations/{number}/analytics/cycle_time_details")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
                 .addPathParam("number", "1");
 
@@ -32,7 +35,8 @@ public class AnalyticsTest extends Before {
 
     @Test(groups = {"GetRequest", "CreateDeleteProject"})
     public void ItShouldKindAnalytics() {
-        apiRequest.endpoint("/projects/{projectId}/iterations/{number}/analytics")
+        apiRequest.method(ApiMethod.GET)
+                .endpoint("/projects/{projectId}/iterations/{number}/analytics")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
                 .addPathParam("number", "1");
 
@@ -46,7 +50,8 @@ public class AnalyticsTest extends Before {
 
     @Test(groups = {"GetRequest", "CreateDeleteProject"})
     public void ItShouldAnalyticsInZeroForANewProject() {
-        apiRequest.endpoint("/projects/{projectId}/iterations/{number}/analytics")
+        apiRequest.method(ApiMethod.GET)
+                .endpoint("/projects/{projectId}/iterations/{number}/analytics")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
                 .addPathParam("number", "1");
 
