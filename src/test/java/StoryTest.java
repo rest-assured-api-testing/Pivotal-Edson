@@ -7,26 +7,9 @@ import configuration.Before;
 import entities.Project;
 import entities.Story;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class StoryTest extends Before {
-    public Story createdStory;
-
-    @BeforeMethod(onlyForGroups = "CreateAStoryToAProject")
-    public void beforeCreateAStoryToAProject() throws JsonProcessingException {
-        Story story = new Story();
-        story.setName("Before Story Test");
-        apiRequest.method(ApiMethod.POST)
-                .endpoint("/projects/{projectId}/stories")
-                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
-                .body(new ObjectMapper().writeValueAsString(story));
-
-        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
-        createdStory = apiResponse.getBody(Story.class);
-        Assert.assertEquals(apiResponse.getStatusCode(), 200);
-        Assert.assertEquals(createdStory.getName(), "Before Story Test");
-    }
 
     @Test(groups = {"PostRequest", "CreateDeleteProject"})
     public void createAStoryToAProject() throws JsonProcessingException {
@@ -44,7 +27,7 @@ public class StoryTest extends Before {
     }
 
     @Test(groups = {"GetRequest", "CreateDeleteProject", "CreateAStoryToAProject"})
-    public void getAllStoriesOfAProjectTest() {
+    public void getAllStoriesOfAProject() {
         apiRequest.method(ApiMethod.GET)
                 .endpoint("/projects/{projectId}/stories")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString());
@@ -55,7 +38,7 @@ public class StoryTest extends Before {
     }
 
     @Test(groups = {"GetRequest", "CreateDeleteProject", "CreateAStoryToAProject"})
-    public void getAStoryOfAProjectTest() {
+    public void getAStoryOfAProject() {
         apiRequest.method(ApiMethod.GET)
                 .endpoint("/projects/{projectId}/stories/{storyId}")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
@@ -68,7 +51,7 @@ public class StoryTest extends Before {
     }
 
     @Test(groups = {"PutRequest", "CreateDeleteProject", "CreateAStoryToAProject"})
-    public void updateAStoryToAProjectTest() throws JsonProcessingException {
+    public void updateAStoryToAProject() throws JsonProcessingException {
         Story story = new Story();
         story.setName("Story Updated");
         apiRequest.method(ApiMethod.PUT)
@@ -84,7 +67,7 @@ public class StoryTest extends Before {
     }
 
     @Test(groups = {"DeleteRequest", "CreateDeleteProject", "CreateAStoryToAProject"})
-    public void deleteAStoryToAProjectTest() {
+    public void deleteAStoryToAProject() {
         apiRequest.method(ApiMethod.DELETE)
                 .endpoint("/projects/{projectId}/stories/{storyId}")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())

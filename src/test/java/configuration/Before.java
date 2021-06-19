@@ -6,10 +6,7 @@ import api.ApiRequest;
 import api.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import entities.Account;
-import entities.AccountArray;
-import entities.Epic;
-import entities.Project;
+import entities.*;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.testng.Assert;
 import org.testng.annotations.*;
@@ -24,6 +21,8 @@ public class Before {
     public Project project;
     public Account account;
     public Epic createdEpic;
+    public Story createdStory;
+
 
     @BeforeSuite
     public void createRequestSpecification() {
@@ -138,5 +137,20 @@ public class Before {
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
         createdEpic = apiResponse.getBody(Epic.class);
         apiResponse.getResponse().then().log().body();
+    }
+
+    @BeforeMethod(onlyForGroups = "CreateAStoryToAProject")
+    public void beforeCreateAStoryToAProject() throws JsonProcessingException {
+        Story story = new Story();
+        story.setName("Before Story Test");
+        apiRequest.method(ApiMethod.POST)
+                .endpoint("/projects/{projectId}/stories")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .body(new ObjectMapper().writeValueAsString(story));
+
+        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
+        createdStory = apiResponse.getBody(Story.class);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        Assert.assertEquals(createdStory.getName(), "Before Story Test");
     }
 }
