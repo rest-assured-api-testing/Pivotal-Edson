@@ -10,7 +10,6 @@ import org.testng.annotations.Test;
 
 public class ProjectTest extends Before {
 
-
     @Test(groups = "GetRequest")
     public void getProject() {
         apiRequest.endpoint("projects");
@@ -19,7 +18,7 @@ public class ProjectTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
-    @Test(groups = {"GetRequest", "CreateProject", "DeleteProject"})
+    @Test(groups = {"GetRequest", "CreateDeleteProject"})
     public void getAProject() {
         apiRequest.endpoint("/projects/{projectId}")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString());
@@ -32,7 +31,7 @@ public class ProjectTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
-    @Test(groups = {"GetRequest", "CreateProject", "DeleteProject"})
+    @Test(groups = {"GetRequest", "CreateDeleteProject"})
     public void getPeopleInProject() {
         apiRequest.endpoint("/my/people")
                 .addQueryParam("project_id", apiResponse.getBody(Project.class).getId().toString());
@@ -46,7 +45,8 @@ public class ProjectTest extends Before {
     public void createAProject() throws JsonProcessingException {
         Project sendProject = new Project();
         sendProject.setName("ApiTesting2");
-        apiRequest.endpoint("/projects")
+        apiRequest.method(ApiMethod.POST)
+                .endpoint("/projects")
                 .body(new ObjectMapper().writeValueAsString(sendProject));
 
         apiResponse = ApiManager.executeWithBody(apiRequest);
@@ -60,7 +60,8 @@ public class ProjectTest extends Before {
 
     @Test(groups = {"DeleteRequest", "CreateProject"})
     public void deleteAnProject() {
-        apiRequest.endpoint("/projects/{projectId}")
+        apiRequest.method(ApiMethod.DELETE)
+                .endpoint("/projects/{projectId}")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString());
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
@@ -68,13 +69,4 @@ public class ProjectTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
-    @Test(groups = {"DeleteRequest"})
-    public void ADeleteAnProject() {
-        apiRequest.endpoint("/projects/{projectId}")
-                .addPathParam("projectId", "2507238");
-
-        ApiResponse apiResponse = ApiManager.execute(apiRequest);
-        Assert.assertEquals(apiResponse.getStatusCode(), 204);
-        apiResponse.getResponse().then().log().body();
-    }
 }

@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 
 public class AnalyticsTest extends Before {
 
-    @Test(groups = {"GetRequest", "CreateProject", "DeleteProject"})
+    @Test(groups = {"GetRequest", "CreateDeleteProject"})
     public void getAnalyticsOfAIterationsOfAProject() {
 
         apiRequest.endpoint("/projects/{projectId}/iterations/{number}/analytics")
@@ -23,7 +23,7 @@ public class AnalyticsTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
-    @Test(groups = {"GetRequest", "CreateProject", "DeleteProject"})
+    @Test(groups = {"GetRequest", "CreateDeleteProject"})
     public void getAnalyticsWithDetailsOfAIterationsOfAProject() {
         apiRequest.endpoint("/projects/{projectId}/iterations/{number}/analytics/cycle_time_details")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())

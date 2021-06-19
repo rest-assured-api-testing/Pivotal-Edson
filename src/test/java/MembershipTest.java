@@ -32,7 +32,7 @@ public class MembershipTest extends Before {
     }
 
 
-    @Test(groups = {"GetRequest", "CreateProject", "DeleteProject"})
+    @Test(groups = {"GetRequest", "CreateDeleteProject"})
     public void getAllMembersOfAProject() {
         apiRequest.endpoint("/projects/{projectId}/memberships")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString());
@@ -43,7 +43,7 @@ public class MembershipTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
-    @Test(groups = {"GetRequest", "CreateProject", "GetMembersOfAProject", "DeleteProject"})
+    @Test(groups = {"GetRequest", "CreateDeleteProject", "GetMembersOfAProject"})
     public void getAMember() {
         apiRequest.endpoint("/projects/{projectId}/memberships/{memberId}")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
@@ -56,7 +56,7 @@ public class MembershipTest extends Before {
         Assert.assertEquals(membership.getKind(), "project_membership");
     }
 
-    @Test(groups = {"PostRequest", "CreateProject", "DeleteProject"})
+    @Test(groups = {"PostRequest", "CreateDeleteProject"})
     public void addAMemberToAProject() throws JsonProcessingException {
         ProjectMembership projectMembership = new ProjectMembership();
         projectMembership.setEmail("emailtest@gmail.com");
@@ -85,7 +85,7 @@ public class MembershipTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
-    @Test(groups = {"PutRequest", "CreateProject", "AddAMemberOfAProject", "GetMembersOfAProject", "DeleteProject"})
+    @Test(groups = {"PutRequest", "CreateDeleteProject", "AddAMemberOfAProject", "GetMembersOfAProject"})
     public void updateAMemberOfAProject() throws JsonProcessingException {
         ProjectMembership projectMembership = new ProjectMembership();
         projectMembership.setRole("viewer");
@@ -100,7 +100,7 @@ public class MembershipTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
-    @Test(groups = {"DeleteRequest", "CreateProject", "AddAMemberOfAProject", "GetMembersOfAProject", "DeleteProject"})
+    @Test(groups = {"DeleteRequest", "CreateDeleteProject", "AddAMemberOfAProject", "GetMembersOfAProject"})
     public void deleteAMemberOfAProject() {
         apiRequest.method(ApiMethod.DELETE)
                 .endpoint("/projects/{projectId}/memberships/{memberId}")

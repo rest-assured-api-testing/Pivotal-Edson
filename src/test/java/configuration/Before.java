@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.Account;
 import entities.AccountArray;
+import entities.Epic;
 import entities.Project;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.testng.Assert;
@@ -22,6 +23,7 @@ public class Before {
     public ApiResponse apiResponse;
     public Project project;
     public Account account;
+    public Epic createdEpic;
 
     @BeforeSuite
     public void createRequestSpecification() {
@@ -57,8 +59,21 @@ public class Before {
         apiRequest.clearPathParam();
         apiRequest.clearQueryParam();
     }
-
     @BeforeMethod(onlyForGroups = "CreateProject" )
+    public void JustCreateProject() throws JsonProcessingException {
+        Project sendProject = new Project();
+        sendProject.setName("BeforeApiTesting");
+        apiRequest.clearPathParam();
+        apiRequest.clearQueryParam();
+        apiRequest.method(ApiMethod.POST)
+                .endpoint("/projects")
+                .body(new ObjectMapper().writeValueAsString(sendProject));
+        apiResponse = ApiManager.executeWithBody(apiRequest);
+        project = apiResponse.getBody(Project.class);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+    }
+
+    @BeforeMethod(onlyForGroups = "CreateDeleteProject" )
     public void CreateProject() throws JsonProcessingException {
         Project sendProject = new Project();
         sendProject.setName("BeforeApiTesting");
@@ -72,8 +87,20 @@ public class Before {
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
     }
 
-    @AfterMethod(onlyForGroups = "DeleteProject" )
+    @AfterMethod(onlyForGroups = "CreateDeleteProject" )
     public void deleteAProject() {
+        apiRequest.clearPathParam();
+        apiRequest.clearQueryParam();
+        apiRequest.method(ApiMethod.DELETE)
+                .endpoint("/projects/{projectId}")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString());
+
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+        Assert.assertEquals(apiResponse.getStatusCode(), 204);
+    }
+
+    @AfterMethod(onlyForGroups = "DeleteProject" )
+    public void JustDeleteAProject() {
         apiRequest.clearPathParam();
         apiRequest.clearQueryParam();
         apiRequest.method(ApiMethod.DELETE)
@@ -97,5 +124,19 @@ public class Before {
         List<Account> accountList = apiResponse.getBodyList(Account.class);
         account = accountList.get(accountList.size()-1);
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
+    }
+
+    @BeforeMethod(onlyForGroups = "CreateEpic")
+    public void beforeCreateEpic() throws JsonProcessingException {
+        Epic epic = new Epic();
+        epic.setName("Before Epic Test");
+        apiRequest.method(ApiMethod.POST)
+                .endpoint("/projects/{projectId}/epics")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .body(new ObjectMapper().writeValueAsString(epic));
+        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        createdEpic = apiResponse.getBody(Epic.class);
+        apiResponse.getResponse().then().log().body();
     }
 }

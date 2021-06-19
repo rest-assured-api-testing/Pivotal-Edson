@@ -7,13 +7,11 @@ import configuration.Before;
 import entities.Epic;
 import entities.Project;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class EpicTest extends Before {
-    Epic createdEpic;
 
-    @Test(groups = {"PostRequest", "CreateProject", "DeleteProject"})
+    @Test(groups = {"PostRequest", "CreateDeleteProject"})
     public void createEpic() throws JsonProcessingException {
         Epic epic = new Epic();
         epic.setName("Epic Test");
@@ -27,22 +25,7 @@ public class EpicTest extends Before {
 
     }
 
-    @BeforeMethod(onlyForGroups = "CreateEpic")
-    public void beforeCreateEpic() throws JsonProcessingException {
-        Epic epic = new Epic();
-        epic.setName("Before Epic Test");
-        apiRequest.method(ApiMethod.POST)
-                .endpoint("/projects/{projectId}/epics")
-                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
-                .body(new ObjectMapper().writeValueAsString(epic));
-        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
-        Assert.assertEquals(apiResponse.getStatusCode(), 200);
-        createdEpic = apiResponse.getBody(Epic.class);
-        apiResponse.getResponse().then().log().body();
-
-    }
-
-    @Test(groups = {"DeleteRequest", "CreateProject", "CreateEpic", "DeleteProject"})
+    @Test(groups = {"DeleteRequest", "CreateDeleteProject", "CreateEpic"})
     public void deleteEpic() {
         apiRequest.method(ApiMethod.DELETE)
                 .endpoint("/projects/{projectId}/epics/{epicId}")
@@ -51,10 +34,9 @@ public class EpicTest extends Before {
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 204);
         apiResponse.getResponse().then().log().body();
-
     }
 
-    @Test(groups = {"GetRequest", "CreateProject", "DeleteProject"})
+    @Test(groups = {"GetRequest", "CreateDeleteProject"})
     public void getAllEpicsOfAProject() {
         apiRequest.endpoint("/projects/{projectId}/epics")
                 .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString());
@@ -63,7 +45,7 @@ public class EpicTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
-    @Test(groups = {"GetRequest", "CreateProject", "CreateEpic", "DeleteProject"})
+    @Test(groups = {"GetRequest", "CreateDeleteProject", "CreateEpic"})
     public void getAnEpicOfAProject() {
         apiRequest.method(ApiMethod.GET)
                 .endpoint("/projects/{projectId}/epics/{epicId}")
@@ -77,7 +59,7 @@ public class EpicTest extends Before {
         Assert.assertEquals(epic.getKind(), "epic");
     }
 
-    @Test(groups = {"PutRequest", "CreateProject", "CreateEpic", "DeleteProject"})
+    @Test(groups = {"PutRequest", "CreateDeleteProject", "CreateEpic"})
     public void updateAnEpicToAProject() throws JsonProcessingException {
         Epic epic = new Epic();
         epic.setName("Epic Updated");
