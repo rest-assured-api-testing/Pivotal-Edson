@@ -5,20 +5,37 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import configuration.Before;
 import entities.Membership;
+import entities.Project;
 import entities.ProjectMembership;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static configuration.Before.*;
+import java.util.List;
+
 
 public class MembershipTest extends Before {
+    public Membership membership;
 
-    @Test
-    public void getAllMembersOfAProject() {
+    @BeforeMethod(onlyForGroups = "GetMembersOfAProject")
+    public void beforeGetAllMembersOfAProject() {
         apiRequest.method(ApiMethod.GET)
                 .endpoint("/projects/{projectId}/memberships")
-                .addPathParam("projectId", "2504464");
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString());
+
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+
+        List<Membership> memberships = apiResponse.getBodyList(Membership.class);
+        membership = memberships.get(memberships.size() - 1);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        apiResponse.getResponse().then().log().body();
+    }
+
+
+    @Test(groups = {"GetRequest", "CreateProject", "DeleteProject"})
+    public void getAllMembersOfAProject() {
+        apiRequest.endpoint("/projects/{projectId}/memberships")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString());
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
 
@@ -26,29 +43,26 @@ public class MembershipTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
-    @Test
+    @Test(groups = {"GetRequest", "CreateProject", "GetMembersOfAProject", "DeleteProject"})
     public void getAMember() {
-        apiRequest.method(ApiMethod.GET)
-                .endpoint("/projects/{projectId}/memberships/{memberId}")
-                .addPathParam("projectId", "2504464")
-                .addPathParam("memberId", "10933892");
+        apiRequest.endpoint("/projects/{projectId}/memberships/{memberId}")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .addPathParam("memberId", membership.getId().toString());
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Membership membership = apiResponse.getBody(Membership.class);
 
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
         Assert.assertEquals(membership.getKind(), "project_membership");
-        apiResponse.validateBodySchema("schemas/membership.json");
     }
 
-    @Test
+    @Test(groups = {"PostRequest", "CreateProject", "DeleteProject"})
     public void addAMemberToAProject() throws JsonProcessingException {
         ProjectMembership projectMembership = new ProjectMembership();
         projectMembership.setEmail("emailtest@gmail.com");
         projectMembership.setRole("member");
-        apiRequest.method(ApiMethod.POST)
-                .endpoint("/projects/{projectId}/memberships")
-                .addPathParam("projectId", "2504464")
+        apiRequest.endpoint("/projects/{projectId}/memberships")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
                 .body(new ObjectMapper().writeValueAsString(projectMembership));
 
         ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
@@ -56,14 +70,29 @@ public class MembershipTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
-    @Test
+    @BeforeMethod(onlyForGroups = "AddAMemberOfAProject")
+    public void BeforeAddAMemberToAProject() throws JsonProcessingException {
+        ProjectMembership projectMembership = new ProjectMembership();
+        projectMembership.setEmail("beforeemailtest@gmail.com");
+        projectMembership.setRole("member");
+        apiRequest.method(ApiMethod.POST)
+                .endpoint("/projects/{projectId}/memberships")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .body(new ObjectMapper().writeValueAsString(projectMembership));
+
+        ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        apiResponse.getResponse().then().log().body();
+    }
+
+    @Test(groups = {"PutRequest", "CreateProject", "AddAMemberOfAProject", "GetMembersOfAProject", "DeleteProject"})
     public void updateAMemberOfAProject() throws JsonProcessingException {
         ProjectMembership projectMembership = new ProjectMembership();
         projectMembership.setRole("viewer");
         apiRequest.method(ApiMethod.PUT)
                 .endpoint("/projects/{projectId}/memberships/{memberId}")
-                .addPathParam("projectId", "2504464")
-                .addPathParam("memberId", "10936079")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .addPathParam("memberId", membership.getId().toString())
                 .body(new ObjectMapper().writeValueAsString(projectMembership));
 
         ApiResponse apiResponse = ApiManager.executeWithBody(apiRequest);
@@ -71,12 +100,12 @@ public class MembershipTest extends Before {
         apiResponse.getResponse().then().log().body();
     }
 
-    @Test
+    @Test(groups = {"DeleteRequest", "CreateProject", "AddAMemberOfAProject", "GetMembersOfAProject", "DeleteProject"})
     public void deleteAMemberOfAProject() {
         apiRequest.method(ApiMethod.DELETE)
                 .endpoint("/projects/{projectId}/memberships/{memberId}")
-                .addPathParam("projectId", "2504464")
-                .addPathParam("memberId", "10936079");
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
+                .addPathParam("memberId", membership.getId().toString());
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 204);

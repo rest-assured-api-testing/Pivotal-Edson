@@ -57,9 +57,7 @@
     "favorite": {
       "type": "boolean"
     },
-    "last_viewed_at": {
-      "type": "string"
-    },
+
     "wants_comment_notification_emails": {
       "type": "boolean"
     },

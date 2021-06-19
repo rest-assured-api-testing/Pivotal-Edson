@@ -6,16 +6,22 @@ import api.ApiRequest;
 import api.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import entities.Account;
+import entities.AccountArray;
 import entities.Project;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.testng.Assert;
 import org.testng.annotations.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Before {
     public static Dotenv dotenv = Dotenv.configure().ignoreIfMalformed().ignoreIfMissing().load();
     public ApiRequest apiRequest;
     public ApiResponse apiResponse;
     public Project project;
+    public Account account;
 
     @BeforeSuite
     public void createRequestSpecification() {
@@ -76,5 +82,20 @@ public class Before {
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 204);
+    }
+
+    @BeforeMethod(onlyForGroups = "GetAccounts" )
+    public void GetAccounts() {
+        apiRequest.clearPathParam();
+        apiRequest.clearQueryParam();
+        apiRequest.method(ApiMethod.GET)
+                .endpoint("/accounts");
+
+        apiResponse = ApiManager.execute(apiRequest);
+        apiResponse.getResponse().then().log().body();
+
+        List<Account> accountList = apiResponse.getBodyList(Account.class);
+        account = accountList.get(accountList.size()-1);
+        Assert.assertEquals(apiResponse.getStatusCode(), 200);
     }
 }

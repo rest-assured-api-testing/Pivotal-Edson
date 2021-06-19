@@ -1,22 +1,18 @@
 import api.ApiManager;
-import api.ApiMethod;
 import api.ApiResponse;
 import configuration.Before;
 import entities.Analytics;
+import entities.Project;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import static configuration.Before.*;
 
 public class AnalyticsTest extends Before {
 
-    @Test
+    @Test(groups = {"GetRequest", "CreateProject", "DeleteProject"})
     public void getAnalyticsOfAIterationsOfAProject() {
 
-        apiRequest.method(ApiMethod.GET)
-                .endpoint("/projects/{projectId}/iterations/{number}/analytics")
-                .addPathParam("projectId", "2504464")
+        apiRequest.endpoint("/projects/{projectId}/iterations/{number}/analytics")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
                 .addPathParam("number", "1");
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
@@ -24,16 +20,17 @@ public class AnalyticsTest extends Before {
 
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
         Assert.assertEquals(analytics.getKind(), "analytics");
+        apiResponse.getResponse().then().log().body();
     }
 
-    @Test
+    @Test(groups = {"GetRequest", "CreateProject", "DeleteProject"})
     public void getAnalyticsWithDetailsOfAIterationsOfAProject() {
-        apiRequest.method(ApiMethod.GET)
-                .endpoint("/projects/{projectId}/iterations/{number}/analytics/cycle_time_details")
-                .addPathParam("projectId", "2504464")
+        apiRequest.endpoint("/projects/{projectId}/iterations/{number}/analytics/cycle_time_details")
+                .addPathParam("projectId", apiResponse.getBody(Project.class).getId().toString())
                 .addPathParam("number", "1");
 
         ApiResponse apiResponse = ApiManager.execute(apiRequest);
         Assert.assertEquals(apiResponse.getStatusCode(), 200);
+        apiResponse.getResponse().then().log().body();
     }
 }

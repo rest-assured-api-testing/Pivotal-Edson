@@ -12,7 +12,7 @@ public class Membership {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String updated_at;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    Me person;
+    Person person;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long project_id;
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -60,11 +60,11 @@ public class Membership {
         this.updated_at = updated_at;
     }
 
-    public Me getPerson() {
+    public Person getPerson() {
         return person;
     }
 
-    public void setPerson(Me person) {
+    public void setPerson(Person person) {
         this.person = person;
     }
 

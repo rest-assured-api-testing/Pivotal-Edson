@@ -2,7 +2,7 @@ package entities;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-public class Me {
+public class Person {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String kind;
     @JsonInclude(JsonInclude.Include.NON_NULL)

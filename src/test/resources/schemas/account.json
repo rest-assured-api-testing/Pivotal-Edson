@@ -11,6 +11,9 @@
     "name": {
       "type": "string"
     },
+    "over_the_limit": {
+      "type": "boolean"
+    },
     "plan": {
       "type": "string"
     },
@@ -19,9 +22,6 @@
     },
     "days_left": {
       "type": "integer"
-    },
-    "over_the_limit": {
-      "type": "boolean"
     },
     "created_at": {
       "type": "string"

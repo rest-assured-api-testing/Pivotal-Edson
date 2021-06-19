@@ -67,4 +67,14 @@ public class ProjectTest extends Before {
         Assert.assertEquals(apiResponse.getStatusCode(), 204);
         apiResponse.getResponse().then().log().body();
     }
+
+    @Test(groups = {"DeleteRequest"})
+    public void ADeleteAnProject() {
+        apiRequest.endpoint("/projects/{projectId}")
+                .addPathParam("projectId", "2507238");
+
+        ApiResponse apiResponse = ApiManager.execute(apiRequest);
+        Assert.assertEquals(apiResponse.getStatusCode(), 204);
+        apiResponse.getResponse().then().log().body();
+    }
 }
